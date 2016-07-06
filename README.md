@@ -119,19 +119,12 @@ riding waves.
 
 #Solution
 
-The key to solving this problem is to leverage principles of dynamic programming, and make use of efficient data structures. 
+The key to solving this problem in a short period of time is to leverage principles of dynamic programming, and make use of efficient data structures. 
 ####Approach####
 ____
 At first glance, the problem structure resembles [group interval scheduling maximization problem (GISMP)](https://en.wikipedia.org/wiki/Interval_scheduling). 
-In these types of problems the goal is to find the largest compatible set — a set of non-overlapping representatives of maximum size. Essentially,
-we need to find a set of waves that do not overlap with each other, and produce the maximum possible amount of fun. In this scenario, 
-we have overlapping waves that have variable start times, point totals, and durations; therefore, it makes sense to store information about the 
-best waves to take as we traverse the set of waves given. It would seem as though we would solve this problem by storing the
-maximum totals for each period of time, but in fact, this was not the case—at least for us it wasn't. We noticed that storing
-maximums for each wave was crucial, so instead of storing maximums for each period of time, we stored maximums for each new wave we 
-encountered. There are two maximums that we needed to store for each new wave: 1) actual, and 2) total. The <em>actual</em> maximum represents the
-accumulated point total that can actually be achieved if this wave is choosen. The <em>total</em> maximum represents the accumulated point 
-total that is the largest amongst all possible combinations of waves up to this wave. 
+In these types of problems, the goal is to find the largest compatible set — a set of non-overlapping representatives of maximum size. In this scenario, it is a set of waves that do not overlap each other and produce the combined maximum points. It would seem as though to solve this problem one would store the maximums for each period of time, but in fact, this is not the case—at least in this implementation. Instead of storing maximums for each period of time, maximums for each new wave encountered is stored within the wave itself. There are two maximums that are stored for each new wave: <em>actual</em> and <em>total</em>. The <em>actual</em> maximum represents the
+highest accumulated point total that can actually be achieved if this wave is choosen. The <em>total</em> maximum represents the highest accumulated point total amongst all possible combinations of waves up to this wave. The <em>total</em> maximum for a particular Wave may not include the Wave as part of the total if there is a higher maximum total that can be achieved without it. 
 
 ####General Idea####
 ___
