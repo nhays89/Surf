@@ -156,5 +156,6 @@ The algorithm we choose to implement goes something like this:
   <li>Return the last wave's <em>real</em> max.</li>
 </ol>
 
+___
 
 <em>2015 Pacific Northwest Region Programming Contest—Division 2</em>
