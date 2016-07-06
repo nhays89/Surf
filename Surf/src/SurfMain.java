@@ -30,7 +30,7 @@ public class SurfMain {
 	/**
 	 * Class integers.
 	 */
-	static int myLargestActualWaves, myLocalLargest, myNumOfWaves;
+	static int myGlobalMax, myLocalMax, myNumOfWaves;
 
 	/**
 	 * Main method to kick off program. Accepts piped file input. Refer to
@@ -40,7 +40,7 @@ public class SurfMain {
 	 *           cmd line args not accpeted, only piped input from file.
 	 */
 	public static void main(String[] args) {
-		long startTime = System.currentTimeMillis() / 1000;
+		long startTime = System.currentTimeMillis();
 		Scanner scan = new Scanner(System.in);
 		myNumOfWaves = scan.nextInt();
 		for (int i = 0; i < myNumOfWaves; i++) {
@@ -57,16 +57,16 @@ public class SurfMain {
 			Wave currentWave = myWaves.get(i);
 			myQueue.add(currentWave);
 			getLargestWave(currentWave.myStartTime);
-			currentWave.setActualPoints(currentWave.myFunPoints + myLargestActualWaves);
-			if (currentWave.myActualPoints > myWaves.get(i - 1).myTotalPoints) {
+			currentWave.setActualPoints(currentWave.myFunPoints + myGlobalMax);
+			if (currentWave.myActualPoints > myWaves.get(i - 1).myRealPoints) {
 				currentWave.setMaximumPoints(currentWave.myActualPoints);
 			} else {
-				currentWave.setMaximumPoints(myWaves.get(i - 1).myTotalPoints);
+				currentWave.setMaximumPoints(myWaves.get(i - 1).myRealPoints);
 			}
 		}
-		long elapsedTime = System.currentTimeMillis() / 1000 - startTime;
-		System.out.println(elapsedTime);
-		System.out.println(myWaves.get(myWaves.size() - 1).myTotalPoints);
+		long elapsedTime = System.currentTimeMillis() - startTime;
+		System.out.println("elapsed time: " + elapsedTime  + " seconds");
+		System.out.println(myWaves.get(myWaves.size() - 1).myRealPoints);
 	}
 
 	/**
@@ -81,14 +81,14 @@ public class SurfMain {
 		while (myQueue.peek() != null) {
 			if (myQueue.peek().myEndTime <= waveStartTime) {
 				Wave wave = myQueue.poll();
-				if (wave.myActualPoints > myLocalLargest) {
-					myLocalLargest = wave.myActualPoints;
+				if (wave.myActualPoints > myLocalMax) {
+					myLocalMax = wave.myActualPoints;
 				}
 			} else {
 				break;
 			}
 		}
-		myLargestActualWaves = myLocalLargest;
+		myGlobalMax = myLocalMax;
 	}
 
 	private static class Wave {
@@ -101,7 +101,7 @@ public class SurfMain {
 		private int myFunPoints;
 		private int myEndTime;
 		private int myActualPoints;
-		private int myTotalPoints;
+		private int myRealPoints;
 
 		/**
 		 * Constructs the wave, and assigns values to each wave.
@@ -142,7 +142,7 @@ public class SurfMain {
 		 *            the value assigned to each wave.
 		 */
 		public void setMaximumPoints(int points) {
-			myTotalPoints = points;
+			myRealPoints = points;
 		}
 
 		/**

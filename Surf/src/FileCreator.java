@@ -7,12 +7,13 @@ public class FileCreator {
 
 	public static void main(String[] args) {
 		try {
-			FileWriter fw = new FileWriter("input_long.txt");
+			
+			FileWriter fw = new FileWriter("input/input_long.txt");
 			fw.write(300000 + "" + '\n');
 			Random r = new Random();
 			ArrayList<int[]> array = new ArrayList<int[]>();
 			for (int i = 0; i < 300000; i++) {
-				int[] arr = new int[] {i, r.nextInt(1000000), r.nextInt(100) };
+				int[] arr = new int[] {i, r.nextInt(1000000), r.nextInt(1000000)};
 				//System.out.println(arr[0] + ", " + arr[1] + ", " + arr[2]);
 				array.add(arr);
 			}
