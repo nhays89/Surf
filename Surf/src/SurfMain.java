@@ -1,140 +1,182 @@
+
 /**
  * Authors: Nicholas A. Hays & Ethan Rowell
  */
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Scanner;
+import java.util.Comparator;
+
 
 /**
- * Kicks off main program. Input comes from piped input file. 
+ * Kicks off main program. Input comes from piped input file in the form of
+ * space seperated integers. Refer to github for syntax. The program determines
+ * the best possible waves to surf given a list of waves. Principle of dynamic
+ * programming.
  * 
  * @author Nicholas A. Hays & Ethan Rowell
  */
 public class SurfMain {
+	/** 
+	 * List of input waves.
+	 */
 	static List<Wave> myWaves = new ArrayList<Wave>();
-	static int numOfWaves;
+	/**
+	 * Queue that maintains a list of waves sorted by end time.
+	 */
+	static PriorityQueue<Wave> myQueue;
+	/**
+	 * Class integers.
+	 */
+	static int myLargestActualWaves, myLocalLargest, myNumOfWaves;
 
 	/**
-	 * Main method to kick off program. Accepts piped file input.
-	 * Refer to github for input syntax. 
+	 * Main method to kick off program. Accepts piped file input. Refer to
+	 * github for input syntax.
 	 * 
-	 * @param cmd line args not accpeted
+	 * @param args
+	 *           cmd line args not accpeted, only piped input from file.
 	 */
 	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis() / 1000;
 		Scanner scan = new Scanner(System.in);
-		numOfWaves = scan.nextInt();
-		for (int i = 0; i < numOfWaves; i++) {
-			Wave wave = new Wave(scan.nextInt(), scan.nextInt(), scan.nextInt());
-			myWaves.add(i, wave);
-			//System.out.println(
-				//	"start time: " + wave.myStartTime + " points: " + wave.myFunPts + " duration " + wave.myEndTime);
+		myNumOfWaves = scan.nextInt();
+		for (int i = 0; i < myNumOfWaves; i++) {
+			Wave startWave = new Wave(scan.nextInt(), scan.nextInt(), scan.nextInt());
+			myWaves.add(startWave);
 		}
 		scan.close();
-		Collections.sort(myWaves);
-		
-		System.out.println("sorted");
-
-		for (int i = 0; i < numOfWaves; i++) {
+		myQueue = new PriorityQueue<Wave>(10, Wave.compareEndTime());
+		Collections.sort(myWaves, Wave.compareStartTime());
+		myWaves.get(0).setMaximumPoints(myWaves.get(0).myFunPoints);
+		myWaves.get(0).setActualPoints(myWaves.get(0).myFunPoints);
+		myQueue.add(myWaves.get(0));
+		for (int i = 1; i < myNumOfWaves; i++) {
 			Wave currentWave = myWaves.get(i);
-			if (i == 0) {
-				currentWave.setTotMaxFunPts(myWaves.get(i).myFunPts);
-				currentWave.setActualMaxFunPoints(myWaves.get(i).myFunPts);
+			myQueue.add(currentWave);
+			getLargestWave(currentWave.myStartTime);
+			currentWave.setActualPoints(currentWave.myFunPoints + myLargestActualWaves);
+			if (currentWave.myActualPoints > myWaves.get(i - 1).myTotalPoints) {
+				currentWave.setMaximumPoints(currentWave.myActualPoints);
 			} else {
-				Wave nonOverlappingWave;
-				if ((nonOverlappingWave = largestNonOverlapping(i)) != null) {
-					currentWave.setActualMaxFunPoints(currentWave.myFunPts + nonOverlappingWave.myActualMaxFunPts);
-					if (currentWave.myActualMaxFunPts > myWaves.get(i - 1).myTotMaxFunPts) {
-						currentWave.setTotMaxFunPts(currentWave.myActualMaxFunPts);
-					} else {
-						currentWave.setTotMaxFunPts(myWaves.get(i - 1).myTotMaxFunPts);
-					}
-				} else {
-					currentWave.setActualMaxFunPoints(currentWave.myFunPts);
-					if (currentWave.myActualMaxFunPts > myWaves.get(i - 1).myTotMaxFunPts) {
-						currentWave.setTotMaxFunPts(currentWave.myActualMaxFunPts);
-					} else {
-						currentWave.setTotMaxFunPts(myWaves.get(i - 1).myTotMaxFunPts);
-					}
-				}
+				currentWave.setMaximumPoints(myWaves.get(i - 1).myTotalPoints);
 			}
 		}
-		System.out.println(myWaves.get(myWaves.size() - 1).myTotMaxFunPts);
+		long elapsedTime = System.currentTimeMillis() / 1000 - startTime;
+		System.out.println(elapsedTime);
+		System.out.println(myWaves.get(myWaves.size() - 1).myTotalPoints);
+	}
 
-	}
-	
 	/**
-	 * Finds the largest non overlapping wave that ends before this wave begins. 
+	 * This method will maintain the largest actual fun points that can be made
+	 * up until a given waves start time. For instance, if a wave starts at 100
+	 * seconds, this method will use that start time to find the wave that ends
+	 * before 100 seconds and has the greatest actual fun points. 
 	 * 
-	 * @param theWave the wave index in the set of waves.  
-	 * @return the largest non overlapping wave that ends before the  
+	 * @param waveStartTime the start to compare against
 	 */
-	public static Wave largestNonOverlapping(int theWave) {
-		Wave currWave = myWaves.get(theWave);
-		int largestActual = 0, indexOfActual = -1;
-		for (int i = theWave - 1; i >= 0; i--) {
-			if (myWaves.get(i).myEndTime <= currWave.myStartTime && myWaves.get(i).myActualMaxFunPts > largestActual) {
-				largestActual = myWaves.get(i).myActualMaxFunPts;
-				indexOfActual = i;
+	static void getLargestWave(int waveStartTime) {
+		while (myQueue.peek() != null) {
+			if (myQueue.peek().myEndTime <= waveStartTime) {
+				Wave wave = myQueue.poll();
+				if (wave.myActualPoints > myLocalLargest) {
+					myLocalLargest = wave.myActualPoints;
+				}
+			} else {
+				break;
 			}
 		}
-		if (indexOfActual != -1)
-			return myWaves.get(indexOfActual);
-		else
-			return null;
+		myLargestActualWaves = myLocalLargest;
 	}
-	
-	/**
-	 * Wave object that holds data about each wave in the set of waves. 
-	 * 
-	 * @author Nicholas A. Hays & Ethan Rowell
-	 */
-	private static class Wave implements Comparable<Wave> {
-		private int myStartTime;
-		private int myFunPts;
-		private int myEndTime;
-		private int myActualMaxFunPts;
-		private int myTotMaxFunPts;
-		
+
+	private static class Wave {
 		/**
-		 * Constructs the wave, and assigns values to each wave. 
-		 * @param startTime the start time the wave will crash on the shore.
-		 * @param funPoints the value assigned to each wave (i.e number representing height, power, etc.)
-		 * @param waitTime the duration of the wave plus the time it takes to swim back out to shore. 
+		 * Wave object that holds data about each wave in the set of waves.
+		 * 
+		 * @author Nicholas A. Hays & Ethan Rowell
+		 */
+		private int myStartTime;
+		private int myFunPoints;
+		private int myEndTime;
+		private int myActualPoints;
+		private int myTotalPoints;
+
+		/**
+		 * Constructs the wave, and assigns values to each wave.
+		 * 
+		 * @param startTime
+		 *            the start time the wave will crash on the shore.
+		 * @param funPoints
+		 *            the value assigned to each wave (i.e a number representing
+		 *            height, power, etc.)
+		 * @param waitTime
+		 *            the duration of the wave plus the time it takes to swim
+		 *            back out to shore.
 		 */
 		public Wave(int startTime, int funPoints, int waitTime) {
 			myStartTime = startTime;
-			myFunPts = funPoints;
+			myFunPoints = funPoints;
 			myEndTime = startTime + waitTime;
 		}
-		
+
 		/**
-		 * Sets the combined total fun points that can acutally be realized by taking this particular
-		 * wave.  
-		 * @param the actual combined maximum points that can be made taking this wave. 
-		 */
-		public void setActualMaxFunPoints(int points) {
-			myActualMaxFunPts = points;
-		}
-		
-		/**
-		 * Sets the combined total fun points that can be made up to this wave. This 
-		 * method may take into account previous wave selections that do not include this wave 
-		 * if they produce larger totals. 
+		 * Sets the combined total fun points that can acutally be realized by
+		 * taking this particular wave.
 		 * 
-		 * @param funPoints the value assigned to each wave. 
+		 * @param the
+		 *            actual combined maximum points that can be made taking
+		 *            this wave.
 		 */
-		public void setTotMaxFunPts(int points) {
-			myTotMaxFunPts = points;
+		public void setActualPoints(int points) {
+			myActualPoints = points;
 		}
 
-		@Override
-		public int compareTo(Wave theOtherWave) {
-			if (this.myStartTime < (theOtherWave).myStartTime) {
-				return -1;
-			} else {
-				return 1;
-			}
+		/**
+		 * Sets the combined total fun points that can be made up to this wave.
+		 * This method may take into account previous wave selections that do
+		 * not include this wave if they produce larger totals.
+		 * 
+		 * @param funPoints
+		 *            the value assigned to each wave.
+		 */
+		public void setMaximumPoints(int points) {
+			myTotalPoints = points;
+		}
+
+		/**
+		 * 
+		 * @return Comparator object that sorts waves by start times.
+		 */
+		static Comparator<Wave> compareStartTime() {
+			return new Comparator<Wave>() {
+				public int compare(Wave w1, Wave w2) {
+					if (w1.myStartTime < w2.myStartTime) {
+						return -1;
+					} else {
+						return 1;
+					}
+				}
+			};
+		}
+
+		/**
+		 * 
+		 * @return Comparator object that sorts Waves by ending time.
+		 */
+		static Comparator<Wave> compareEndTime() {
+			return new Comparator<Wave>() {
+				public int compare(Wave w1, Wave w2) {
+					if (w1.myEndTime < w2.myEndTime) {
+						return -1;
+					} else if (w1.myEndTime == w2.myEndTime) {
+						return 0;
+					} else {
+						return 1;
+					}
+				}
+			};
 		}
 	}
 }
