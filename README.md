@@ -123,8 +123,7 @@ The key to solving this problem in a short period of time is to leverage princip
 ####Approach####
 ____
 At first glance, the problem structure resembles [group interval scheduling maximization problem (GISMP)](https://en.wikipedia.org/wiki/Interval_scheduling). 
-In these types of problems, the goal is to find the largest compatible set — a set of non-overlapping representatives of maximum size. In this scenario, it is a set of waves that do not overlap each other and produce the combined maximum points. It would seem as though to solve this problem one would store the maximums for each period of time, but in fact, this is not the case—at least in this implementation. Instead of storing maximums for each period of time, maximums for each new wave encountered is stored within the wave itself. There are two maximums that are stored for each new wave: <em>actual</em> and <em>total</em>. The <em>actual</em> maximum represents the
-highest accumulated point total that can actually be achieved if this wave is choosen. The <em>total</em> maximum represents the highest accumulated point total amongst all possible combinations of waves up to this wave. The <em>total</em> maximum for a particular Wave may not include the Wave as part of the total if there is a higher maximum total that can be achieved without it. 
+In these types of problems, the goal is to find the largest compatible set — a set of non-overlapping representatives of maximum size. In this scenario, a set of non-overlapping waves that produce the combined maximum points. It would seem as though to solve this problem one would store the maximums for each period of time up to the last waves start time, but this is not the case—at least in this implementation. Instead, maximums are stored for each new wave. There are two maximums of interest: <em>actual</em> and <em>real</em>. The <em>actual</em> maximum represents the highest accumulated point total for this wave and all subsequent non-overlapping waves that come before it assuming this wave is actually a member of the set. The <em>real</em> maximum represents the highest accumulated point total amongst all possible combinations of waves up to this wave regardless if this wave is included in the set of waves. Therefore, the <em>real</em> maximum for a particular wave may not include the wave as part of the total if there is a higher maximum total that can be achieved without it. 
 
 ####General Idea####
 ___
@@ -133,15 +132,15 @@ The algorithm we choose to implement goes something like this:
 <ol>
   <li>For each line in the input data:
     <ol>
-      <li> Create a Wave object (start time, fun points, and duration).</li>
-      <li> Add this Wave to an ArrayList of Wave's.</li>
+      <li> Create a wave object (start time, fun points, and duration).</li>
+      <li> Add this wave to an ArrayList of wave's.</li>
     </ol>
   </li>
-  <li>Sort the ArrayList by the Wave's start time (when the wave crashes).</li>
-  <li>For each Wave in the list:
+  <li>Sort the ArrayList by the wave's start time (when the wave crashes).</li>
+  <li>For each wave in the list:
     <ol>
-      <li>Add this Wave to a Priority Heap (lowest end time first).</li>
-      <li>For each Wave in the heap that ends (start time + duration) before this Wave begins (non overlapping):
+      <li>Add this wave to a Priority Heap (lowest end time first).</li>
+      <li>For each wave in the heap that ends (start time + duration) before this wave begins (non overlapping):
         <ol>
           <li>Remove it from the heap.</li>
           <li>Compare its <em>actual</em> max against the local <em>actual</em> max.</li>
@@ -149,13 +148,12 @@ The algorithm we choose to implement goes something like this:
         </ol>
       </li>
       <li>Set the global <em>actual</em> max = local <em>actual</em> max</li>
-      <li>Set this Wave's <em>actual</em> max = its fun points + global <em>actual</em> max.</li>
-      <li>If this waves <em>actual</em> max  > previous wave <em>total</em> max ? set this wave <em>total</em> max = its <em>actual</em> max :
-      set this waves <em>total</em> max = previous waves <em>total</em> max.
+      <li>Set this wave's <em>actual</em> max = its fun points + global <em>actual</em> max.</li>
+      <li>If this wave's <em>actual</em> max  > previous wave <em>real</em> max ? set this wave <em>real</em> max = its <em>actual</em> max :set this wave's <em>real</em> max = previous waves <em>real</em> max.
       </li>
     </ol>
   </li>
-  <li>Return the last wave <em>total</em> max.</li>
+  <li>Return the last wave's <em>real</em> max.</li>
 </ol>
 
 
