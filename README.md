@@ -1,6 +1,6 @@
 #[Surf](http://acmicpc-pacnw.org/ProblemSet/2015/Statements/div2.pdf)
 
-Division 2 ACM ICPC programming problem. 
+Division 2 ACM ICPC programming problem. Time: 4 seconds.
 
 <p>
 
@@ -156,6 +156,9 @@ The algorithm we choose to implement goes something like this:
   <li>Return the last wave's <em>real</em> max.</li>
 </ol>
 
+####Time
+---
+Can analyze input size of 300,000 waves and determine real max in 798 milli seconds. 
 ___
 
 <em>2015 Pacific Northwest Region Programming Contest—Division 2</em>
