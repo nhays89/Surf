@@ -1,6 +1,6 @@
 
 /**
- * Authors: Nicholas A. Hays & Ethan Rowell
+ * Author: Nicholas A. Hays
  */
 import java.util.ArrayList;
 import java.util.Collections;
