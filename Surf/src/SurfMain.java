@@ -65,7 +65,7 @@ public class SurfMain {
 			}
 		}
 		long elapsedTime = System.currentTimeMillis() - startTime;
-		System.out.println("elapsed time: " + elapsedTime  + " seconds");
+		System.out.println("elapsed time: " + elapsedTime  + " milli seconds");
 		System.out.println(myWaves.get(myWaves.size() - 1).myRealPoints);
 	}
 
