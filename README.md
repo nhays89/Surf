@@ -1,4 +1,4 @@
-#[Surf](http://acmicpc-pacnw.org/ProblemSet/2015/Statements/div2.pdf)
+# [Surf](http://acmicpc-pacnw.org/ProblemSet/2015/Statements/div2.pdf)
 
 Division 2 ACM ICPC programming problem. Time: 4 seconds.
 
@@ -8,7 +8,7 @@ Division 2 ACM ICPC programming problem. Time: 4 seconds.
 
 </p>
 
-##Problem
+## Problem
 Now that you’ve come to Florida and taken up surfing, you love it! Of course, you’ve realized that
 if you take a particular wave, even if it’s very fun, you may miss another wave that’s just about
 to come that’s even more fun. Luckily, you’ve gotten excellent data for each wave that is going to
@@ -53,7 +53,7 @@ input, the correct answer (maximal number of fun points) is 110.
 you could earn.
 </section>
 
-###Input###
+### Input
 ___
 The first line of input contains a single integer <em>n</em> (1 ≤ <em>n</em> ≤ 300,000), representing the total number
 of waves for the day. The <em>i</em>th line (1 ≤ <em>i</em> ≤<em> n</em>) that follows will contain three space separated
@@ -62,7 +62,7 @@ of the <em>i</em>th wave, respectively. You can ride another wave occurring at e
 taking the <em>i</em>th wave. It is guaranteed that no two waves occur at the same time. The waves may
 not be listed in chronological order
 
-###Output###
+### Output
 ___
 Print, on a single line, a single integer indicating the maximum amount of fun points you can get
 riding waves.
@@ -117,15 +117,15 @@ riding waves.
   </tr>
 </table>
 
-##Solution
+## Solution
 
 The key to solving this problem in a short period of time is to leverage principles of dynamic programming, and make use of efficient data structures. 
-###Approach###
+### Approach
 ____
 At first glance, the problem structure resembles [group interval scheduling maximization problem (GISMP)](https://en.wikipedia.org/wiki/Interval_scheduling). 
 In these types of problems, the goal is to find the largest compatible set — a set of non-overlapping representatives of maximum size. In this scenario, a set of non-overlapping waves that produce the combined maximum points. It would seem as though to solve this problem one would store the maximums for each period of time up to the last waves start time, but this is not the case—at least in this implementation. Instead, maximums are stored for each new wave. There are two maximums of interest: <em>actual</em> and <em>real</em>. The <em>actual</em> maximum represents the highest accumulated point total for this wave and all subsequent non-overlapping waves that come before it assuming this wave is actually a member of the set. The <em>real</em> maximum represents the highest accumulated point total amongst all possible non-overlapping combinations of waves up to this wave regardless if this wave is included in the set of waves. Therefore, the <em>real</em> maximum for a particular wave may not include the wave as part of the total if there is a higher maximum total that can be achieved without it. 
 
-###General Idea###
+### General Idea
 ___
 
 The algorithm we choose to implement goes something like this:
@@ -156,7 +156,7 @@ The algorithm we choose to implement goes something like this:
   <li>Return the last wave's <em>real</em> max.</li>
 </ol>
 
-####Time
+#### Time
 ---
 Can analyze input size of 300,000 waves and determine real max in 798 milli seconds. 
 ___
